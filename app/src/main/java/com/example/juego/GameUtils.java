@@ -1,14 +1,43 @@
 package com.example.juego;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.TextView;
 
-public class GameUtils {
+import androidx.annotation.DrawableRes;
 
-    public static void clearColors(TextView[][] cellList) {
+
+public class GameUtils {
+    public static void setCellListColors(TextView[][] cellList) {
         for (int i = 0; i < cellList.length; i++) {
             for (int j = 0; j < cellList[0].length; j++) {
-                cellList[i][j].setTextColor(Color.BLACK);
+                if (cellList[i][j].getText().equals("2")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ffcdd2"));
+                } else if (cellList[i][j].getText().equals("4")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ef9a9a"));
+                } else if (cellList[i][j].getText().equals("8")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#e57373"));
+                } else if (cellList[i][j].getText().equals("16")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ef5350"));
+                } else if (cellList[i][j].getText().equals("32")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#f06292"));
+                } else if (cellList[i][j].getText().equals("64")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ec407a"));
+                } else if (cellList[i][j].getText().equals("128")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ffe082"));
+                } else if (cellList[i][j].getText().equals("256")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ffe082"));
+                } else if (cellList[i][j].getText().equals("512")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ffe082"));
+                } else if (cellList[i][j].getText().equals("1024")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#ffe082"));
+                } else if (cellList[i][j].getText().equals("2048")) {
+                    cellList[i][j].setTextColor(Color.parseColor("#7986cc"));
+                }
             }
         }
     }
@@ -21,55 +50,17 @@ public class GameUtils {
         do {
             randomNumberY = (int) Math.floor(Math.random() * 4);
             randomNumberX = (int) Math.floor(Math.random() * 4);
-        } while (!cellList[randomNumberY][randomNumberX].getText().equals("0"));
+        } while (!cellList[randomNumberY][randomNumberX].getText().equals(""));
 
         cellList[randomNumberY][randomNumberX].setText("2");
-        cellList[randomNumberY][randomNumberX].setTextColor(Color.BLUE);
-
-
+        startAnimation(cellList[randomNumberY][randomNumberX]);
+        setCellListColors(cellList);
 
     }
 
-    public static void firstTimeGeneration(TextView[][] cellList) {
-
-        int randomNumberY;
-        int randomNumberX;
-
-        for (int i = 0; i < cellList.length; i++) {
-            for (int j = 0; j < cellList[0].length; j++) {
-                cellList[i][j].setText("0");
-            }
-        }
-
-        for (int i = 0; i < 2; i++) {
-            do {
-                randomNumberY = (int) Math.floor(Math.random() * 4);
-                randomNumberX = (int) Math.floor(Math.random() * 4);
-            } while (!cellList[randomNumberY][randomNumberX].getText().equals("0"));
-            cellList[randomNumberY][randomNumberX].setText("2");
-            cellList[randomNumberY][randomNumberX].setTextColor(Color.BLUE);
-        }
-
-        /*
-        cellList[0][0].setText("2");
-        cellList[0][1].setText("2");
-        cellList[0][2].setText("2");
-        cellList[0][3].setText("0");
-
-        cellList[1][0].setText("0");
-        cellList[1][1].setText("2");
-        cellList[1][2].setText("2");
-        cellList[1][3].setText("0");
-
-        cellList[2][0].setText("2");
-        cellList[2][1].setText("0");
-        cellList[2][2].setText("0");
-        cellList[2][3].setText("0");
-
-        cellList[3][0].setText("2");
-        cellList[3][1].setText("0");
-        cellList[3][2].setText("0");
-        cellList[3][3].setText("2");
-         */
+    public static void startAnimation(TextView textView) {
+        Animation rotate = AnimationUtils.loadAnimation(textView.getContext(), R.anim.rotate_animation);
+        textView.startAnimation(rotate);
     }
+
 }

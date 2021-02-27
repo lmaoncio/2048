@@ -3,10 +3,14 @@ package com.example.juego;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
     private TextView[][] cellList;
@@ -35,38 +39,36 @@ public class MainActivity extends AppCompatActivity {
 
         createCells();
 
-        GameUtils.firstTimeGeneration(cellList);
+        GameUtils.generateNumber(cellList);
 
         GridLayout gridLayout = findViewById(R.id.gridLayout);
 
-
         gridLayout.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
             public void onSwipeTop() {
-                GameUtils.clearColors(cellList);
-
                 int row;
                 int column = 3;
                 boolean stop = false;
+
                 do {
                     for (row = 1; row < cellList.length; row++) {
-                        if (column >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (column >= 0 && cellList[row][column].getText().equals("")) {
                             if (row == cellList.length - 1) {
                                 column--;
                             }
                             continue;
                         } else if (column >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int cellAbove = Integer.parseInt((String) cellList[row - 1][column].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String aboveCell = (String) cellList[row - 1][column].getText();
                             int aboveY = row - 1;
 
-                            while (cellAbove == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[aboveY][column].setText(String.valueOf(originalCell));
+                            while (aboveCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[aboveY][column].setText(originalCell);
                                 if (aboveY - 1 > 0) {
-                                    cellAbove = Integer.parseInt((String) cellList[aboveY - 1][column].getText());
+                                    aboveCell = (String) cellList[aboveY - 1][column].getText();
                                 } else {
-                                    cellAbove = Integer.parseInt((String) cellList[0][column].getText());
-                                    cellList[row][column].setText("0");
+                                    aboveCell = (String) cellList[0][column].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 row--;
                                 aboveY--;
@@ -80,17 +82,21 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
+
                 stop = false;
                 column = 3;
                 do {
                     for (row = 1; row < cellList.length; row++) {
-                        int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                        int cellAbove = Integer.parseInt((String) cellList[row - 1][column].getText());
-                        int aboveY = row - 1;
-                        if (originalCell == cellAbove) {
-                            cellList[aboveY][column].setText(String.valueOf(originalCell + cellAbove));
-                            cellList[row][column].setText("0");
+                        String originalCell = (String) cellList[row][column].getText();
+                        String aboveCell = (String) cellList[row - 1][column].getText();
+                        if (!originalCell.equals("")) {
+                            int aboveY = row - 1;
+                            if (originalCell.equals(aboveCell)) {
+                                cellList[aboveY][column].setText(String.valueOf(Integer.parseInt(originalCell) + (Integer.parseInt(aboveCell))));
+                                cellList[row][column].setText("");
+                            }
                         }
+
                         if (row == 3) {
                             column--;
                             if (column < 0) {
@@ -104,29 +110,29 @@ public class MainActivity extends AppCompatActivity {
                 stop = false;
                 do {
                     for (row = 1; row < cellList.length; row++) {
-                        if (column >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (column >= 0 && cellList[row][column].getText().equals("")) {
                             if (row == cellList.length - 1) {
                                 column--;
                             }
                             continue;
                         } else if (column >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int cellAbove = Integer.parseInt((String) cellList[row - 1][column].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String aboveCell = (String) cellList[row - 1][column].getText();
                             int aboveY = row - 1;
-                            while (cellAbove == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[aboveY][column].setText(String.valueOf(originalCell));
+
+                            while (aboveCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[aboveY][column].setText(originalCell);
                                 if (aboveY - 1 > 0) {
-                                    cellAbove = Integer.parseInt((String) cellList[aboveY - 1][column].getText());
+                                    aboveCell = (String) cellList[aboveY - 1][column].getText();
                                 } else {
-                                    cellAbove = Integer.parseInt((String) cellList[0][column].getText());
-                                    cellList[row][column].setText("0");
+                                    aboveCell = (String) cellList[0][column].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 row--;
                                 aboveY--;
                             }
                         }
-
                         if (row == 3) {
                             column--;
                             if (column < 0) {
@@ -135,37 +141,34 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-
                 GameUtils.generateNumber(cellList);
                 Log.d("UP", "UP");
             }
 
             public void onSwipeRight() {
-                GameUtils.clearColors(cellList);
-
                 int column;
                 int row = 3;
                 boolean stop = false;
                 do {
                     for (column = 2; column >= 0; column--) {
-                        if (row >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (row >= 0 && cellList[row][column].getText().equals("")) {
                             if (column == 0) {
                                 row--;
                             }
                             continue;
                         } else if (row >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int rightCell = Integer.parseInt((String) cellList[row][column + 1].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String rightCell = (String) cellList[row][column + 1].getText();
                             int rightX = column + 1;
 
-                            while (rightCell == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[row][rightX].setText(String.valueOf(originalCell));
+                            while (rightCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[row][rightX].setText(originalCell);
                                 if (rightX + 1 < 3) {
-                                    rightCell = Integer.parseInt((String) cellList[row][rightX + 1].getText());
+                                    rightCell = (String) cellList[row][rightX + 1].getText();
                                 } else {
-                                    rightCell = Integer.parseInt((String) cellList[row][3].getText());
-                                    cellList[row][column].setText("0");
+                                    rightCell = (String) cellList[row][3].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 column++;
                                 rightX++;
@@ -184,13 +187,16 @@ public class MainActivity extends AppCompatActivity {
                 row = 3;
                 do {
                     for (column = 2; column >= 0; column--) {
-                        int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                        int rightCell = Integer.parseInt((String) cellList[row][column + 1].getText());
-                        int rightX = column + 1;
-                        if (originalCell == rightCell) {
-                            cellList[row][rightX].setText(String.valueOf(originalCell + rightCell));
-                            cellList[row][column].setText("0");
+                        String originalCell = (String) cellList[row][column].getText();
+                        String rightCell = (String) cellList[row][column + 1].getText();
+                        if (!originalCell.equals("")) {
+                            int rightX = column + 1;
+                            if (originalCell.equals(rightCell)) {
+                                cellList[row][rightX].setText(String.valueOf(Integer.parseInt(originalCell) + Integer.parseInt(rightCell)));
+                                cellList[row][column].setText("");
+                            }
                         }
+
                         if (column == 0) {
                             row--;
                             if (row < 0) {
@@ -204,24 +210,24 @@ public class MainActivity extends AppCompatActivity {
                 row = 3;
                 do {
                     for (column = 2; column >= 0; column--) {
-                        if (row >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (row >= 0 && cellList[row][column].getText().equals("")) {
                             if (column == 0) {
                                 row--;
                             }
                             continue;
                         } else if (row >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int rightCell = Integer.parseInt((String) cellList[row][column + 1].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String rightCell = (String) cellList[row][column + 1].getText();
                             int rightX = column + 1;
 
-                            while (rightCell == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[row][rightX].setText(String.valueOf(originalCell));
+                            while (rightCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[row][rightX].setText(originalCell);
                                 if (rightX + 1 < 3) {
-                                    rightCell = Integer.parseInt((String) cellList[row][rightX + 1].getText());
+                                    rightCell = (String) cellList[row][rightX + 1].getText();
                                 } else {
-                                    rightCell = Integer.parseInt((String) cellList[row][3].getText());
-                                    cellList[row][column].setText("0");
+                                    rightCell = (String) cellList[row][3].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 column++;
                                 rightX++;
@@ -235,37 +241,34 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-
                 GameUtils.generateNumber(cellList);
                 Log.d("RIGHT", "RIGHT");
             }
 
             public void onSwipeLeft() {
-                GameUtils.clearColors(cellList);
-
                 int column;
                 int row = 3;
                 boolean stop = false;
                 do {
                     for (column = 1; column <= 3; column++) {
-                        if (row >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (row >= 0 && cellList[row][column].getText().equals("")) {
                             if (column == 3) {
                                 row--;
                             }
                             continue;
                         } else if (row >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int leftCell = Integer.parseInt((String) cellList[row][column - 1].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String leftCell = (String) cellList[row][column - 1].getText();
                             int leftX = column - 1;
 
-                            while (leftCell == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[row][leftX].setText(String.valueOf(originalCell));
+                            while (leftCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[row][leftX].setText(originalCell);
                                 if (leftX - 1 > 0) {
-                                    leftCell = Integer.parseInt((String) cellList[row][leftX - 1].getText());
+                                    leftCell = (String) cellList[row][leftX - 1].getText();
                                 } else {
-                                    leftCell = Integer.parseInt((String) cellList[row][0].getText());
-                                    cellList[row][column].setText("0");
+                                    leftCell = (String) cellList[row][0].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 column--;
                                 leftX--;
@@ -283,14 +286,17 @@ public class MainActivity extends AppCompatActivity {
                 stop = false;
                 row = 3;
                 do {
-                    for (column = 1; column <=3; column++) {
-                        int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                        int leftCell = Integer.parseInt((String) cellList[row][column - 1].getText());
+                    for (column = 1; column <= 3; column++) {
+                        String originalCell = (String) cellList[row][column].getText();
+                        String leftCell = (String) cellList[row][column - 1].getText();
                         int leftX = column - 1;
-                        if (originalCell == leftCell) {
-                            cellList[row][leftX].setText(String.valueOf(originalCell + leftCell));
-                            cellList[row][column].setText("0");
+                        if (!originalCell.equals("")) {
+                            if (originalCell.equals(leftCell)) {
+                                cellList[row][leftX].setText(String.valueOf(Integer.parseInt(originalCell) + Integer.parseInt(leftCell)));
+                                cellList[row][column].setText("");
+                            }
                         }
+
                         if (column == 3) {
                             row--;
                             if (row < 0) {
@@ -300,26 +306,28 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } while (!stop);
 
+                stop = false;
+                row = 3;
                 do {
                     for (column = 1; column <= 3; column++) {
-                        if (row >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (row >= 0 && cellList[row][column].getText().equals("")) {
                             if (column == 3) {
                                 row--;
                             }
                             continue;
                         } else if (row >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int leftCell = Integer.parseInt((String) cellList[row][column - 1].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String leftCell = (String) cellList[row][column - 1].getText();
                             int leftX = column - 1;
 
-                            while (leftCell == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[row][leftX].setText(String.valueOf(originalCell));
+                            while (leftCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[row][leftX].setText(originalCell);
                                 if (leftX - 1 > 0) {
-                                    leftCell = Integer.parseInt((String) cellList[row][leftX - 1].getText());
+                                    leftCell = (String) cellList[row][leftX - 1].getText();
                                 } else {
-                                    leftCell = Integer.parseInt((String) cellList[row][0].getText());
-                                    cellList[row][column].setText("0");
+                                    leftCell = (String) cellList[row][0].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 column--;
                                 leftX--;
@@ -333,37 +341,34 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-
                 GameUtils.generateNumber(cellList);
                 Log.d("LEFT", "LEFT");
             }
 
             public void onSwipeBottom() {
-                GameUtils.clearColors(cellList);
-
                 int row;
                 int column = 3;
                 boolean stop = false;
                 do {
                     for (row = 2; row >= 0; row--) {
-                        if (column >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (column >= 0 && cellList[row][column].getText().equals("")) {
                             if (row == 0) {
                                 column--;
                             }
                             continue;
                         } else if (column >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int belowCell = Integer.parseInt((String) cellList[row + 1][column].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String belowCell = (String) cellList[row + 1][column].getText();
                             int belowY = row + 1;
 
-                            while (belowCell == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[belowY][column].setText(String.valueOf(originalCell));
+                            while (belowCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[belowY][column].setText(originalCell);
                                 if (belowY + 1 < 3) {
-                                    belowCell = Integer.parseInt((String) cellList[belowY + 1][column].getText());
+                                    belowCell = (String) cellList[belowY + 1][column].getText();
                                 } else {
-                                    belowCell = Integer.parseInt((String) cellList[3][column].getText());
-                                    cellList[row][column].setText("0");
+                                    belowCell = (String) cellList[3][column].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 row++;
                                 belowY++;
@@ -382,12 +387,14 @@ public class MainActivity extends AppCompatActivity {
                 column = 3;
                 do {
                     for (row = 2; row >= 0; row--) {
-                        int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                        int belowCell = Integer.parseInt((String) cellList[row + 1][column].getText());
+                        String originalCell = (String) cellList[row][column].getText();
+                        String belowCell = (String) cellList[row + 1][column].getText();
                         int belowY = row + 1;
-                        if (originalCell == belowCell) {
-                            cellList[belowY][column].setText(String.valueOf(originalCell + belowCell));
-                            cellList[row][column].setText("0");
+                        if (!originalCell.equals("")) {
+                            if (originalCell.equals(belowCell)) {
+                                cellList[belowY][column].setText(String.valueOf(Integer.parseInt(originalCell) + Integer.parseInt(belowCell)));
+                                cellList[row][column].setText("");
+                            }
                         }
                         if (row == 0) {
                             column--;
@@ -402,24 +409,24 @@ public class MainActivity extends AppCompatActivity {
                 column = 3;
                 do {
                     for (row = 2; row >= 0; row--) {
-                        if (column >= 0 && cellList[row][column].getText().equals("0")) {
+                        if (column >= 0 && cellList[row][column].getText().equals("")) {
                             if (row == 0) {
                                 column--;
                             }
                             continue;
                         } else if (column >= 0) {
-                            int originalCell = Integer.parseInt((String) cellList[row][column].getText());
-                            int belowCell = Integer.parseInt((String) cellList[row + 1][column].getText());
+                            String originalCell = (String) cellList[row][column].getText();
+                            String belowCell = (String) cellList[row + 1][column].getText();
                             int belowY = row + 1;
 
-                            while (belowCell == 0) {
-                                cellList[row][column].setText("0");
-                                cellList[belowY][column].setText(String.valueOf(originalCell));
+                            while (belowCell.equals("")) {
+                                cellList[row][column].setText("");
+                                cellList[belowY][column].setText(originalCell);
                                 if (belowY + 1 < 3) {
-                                    belowCell = Integer.parseInt((String) cellList[belowY + 1][column].getText());
+                                    belowCell = (String) cellList[belowY + 1][column].getText();
                                 } else {
-                                    belowCell = Integer.parseInt((String) cellList[3][column].getText());
-                                    cellList[row][column].setText("0");
+                                    belowCell = (String) cellList[3][column].getText();
+                                    cellList[row][column].setText("");
                                 }
                                 row++;
                                 belowY++;
@@ -433,7 +440,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-
                 GameUtils.generateNumber(cellList);
                 Log.d("DOWN", "DOWN");
             }

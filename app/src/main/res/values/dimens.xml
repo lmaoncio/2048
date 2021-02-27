@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="standar_width">100dp</dimen>
-    <dimen name="standard_heigh">100dp</dimen>
+    <dimen name="standar_width">70dp</dimen>
+    <dimen name="standard_heigh">70dp</dimen>
+    <dimen name="textView_size">24sp</dimen>
 </resources>

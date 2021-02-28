@@ -3,4 +3,8 @@
     <dimen name="standar_width">70dp</dimen>
     <dimen name="standard_heigh">70dp</dimen>
     <dimen name="textView_size">24sp</dimen>
+    <dimen name="button_height">36dp</dimen>
+    <dimen name="small_padding">6dp</dimen>
+    <dimen name="divider_height">3dp</dimen>
+    <dimen name="big_padding">16dp</dimen>
 </resources>

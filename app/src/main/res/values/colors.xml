@@ -8,6 +8,8 @@
     <color name="secondaryDarkColor">#82b3c9</color>
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#000000</color>
-
-
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="buttonLabel">#d3d3d3</color>
 </resources>

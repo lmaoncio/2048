@@ -1,4 +1,4 @@
-package com.example.juego;
+package com.example.juego.listeners;
 
 import android.content.Context;
 import android.view.GestureDetector;

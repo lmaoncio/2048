@@ -1,4 +1,4 @@
-package com.example.juego;
+package com.example.juego.utils;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -9,6 +9,8 @@ import android.view.animation.RotateAnimation;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
+
+import com.example.juego.R;
 
 
 public class GameUtils {

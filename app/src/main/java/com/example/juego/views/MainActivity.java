@@ -1,16 +1,17 @@
-package com.example.juego;
+package com.example.juego.views;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Text;
+import com.example.juego.db.WordListOpenHelper;
+import com.example.juego.listeners.OnSwipeTouchListener;
+import com.example.juego.R;
+import com.example.juego.utils.GameUtils;
 
 public class MainActivity extends AppCompatActivity {
     private TextView[][] cellList;
@@ -36,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         createCells();
+
+        WordListOpenHelper mDB = new WordListOpenHelper(this);
 
         GameUtils.generateNumber(cellList);
 
@@ -48,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
                 int row;
                 int column = 3;
                 boolean stop = false;
-
                 do {
                     for (row = 1; row < cellList.length; row++) {
                         if (column >= 0 && cellList[row][column].getText().equals("")) {

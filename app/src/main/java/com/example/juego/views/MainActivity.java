@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -541,10 +542,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void saveCellList(TextView[][] cellList) {
         for (int i = 0; i < cellList.length; i++) {
             for (int j = 0; j < cellList[0].length; j++) {
-                savedNumberList[i][j]  = cellList[i][j].getText().toString();
+                savedNumberList[i][j] = cellList[i][j].getText().toString();
             }
         }
         System.out.println("");
@@ -560,7 +562,7 @@ public class MainActivity extends AppCompatActivity {
                     count++;
                 }
 
-                if(cellList[i][j].getText().equals("2048")) {
+                if (cellList[i][j].getText().equals("2048")) {
                     win = true;
                 }
             }
@@ -579,13 +581,11 @@ public class MainActivity extends AppCompatActivity {
             builder.setPositiveButton("NEW GAME", (dialog, id) -> {
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(intent);
-                finish();
             });
 
-            builder.setNegativeButton("MENU",(dialog, id) -> {
+            builder.setNegativeButton("MENU", (dialog, id) -> {
                 Intent intent = new Intent(MainActivity.this, MenuActivity.class);
                 startActivity(intent);
-                finish();
             });
 
             AlertDialog dialog = builder.create();

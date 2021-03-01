@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Juego">
         <activity android:name=".views.RankedActivity" />
-        <activity android:name=".views.EditWordActivity" />
+        <activity android:name=".views.EditScoreActivity" />
         <activity android:name=".views.SearchActivity" />
         <activity android:name=".views.MenuActivity" />
         <activity android:name=".views.SplashScreen">

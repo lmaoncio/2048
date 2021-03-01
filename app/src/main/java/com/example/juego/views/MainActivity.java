@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -17,7 +17,8 @@ import com.example.juego.R;
 import com.example.juego.utils.GameUtils;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView[][] cellList;
+    TextView[][] cellList;
+    String[][] savedNumberList;
     TextView c1;
     TextView c2;
     TextView c3;
@@ -36,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
     TextView c16;
     TextView scoreTextView;
     TextView bestScoreTextView;
-    EditText userNameEditText;
+    ImageButton undoImageButton;
+    ImageButton newGameImageButton;
+    ImageButton homeImageButton;
     int score = 0;
     ScoreHelper mDB;
 
@@ -48,25 +51,37 @@ public class MainActivity extends AppCompatActivity {
         createCells();
         scoreTextView = findViewById(R.id.scoreTextView);
         bestScoreTextView = findViewById(R.id.bestScoreTextView);
-
-        userNameEditText = findViewById(R.id.editTextUserName);
-        userNameEditText.setOnKeyListener((v, keyCode, event) -> {
-           if (keyCode == 66) {
-               userNameEditText.setEnabled(false);
-               return true;
-           }
-            return false;
-        });
+        newGameImageButton = findViewById(R.id.newGameButton);
+        undoImageButton = findViewById(R.id.undoButton);
+        homeImageButton = findViewById(R.id.homeButton);
 
         mDB = new ScoreHelper(this);
+        bestScoreTextView.setText(mDB.getBestScore());
 
         GameUtils.generateNumber(cellList);
 
-        bestScoreTextView.setText(mDB.getBestScore());
+        homeImageButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MenuActivity.class);
+            startActivity(intent);
+        });
+
+        newGameImageButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
+
+        undoImageButton.setOnClickListener(v -> {
+            for (int i = 0; i < cellList.length; i++) {
+                for (int j = 0; j < cellList[0].length; j++) {
+                    cellList[i][j].setText(savedNumberList[i][j]);
+                }
+            }
+        });
         GridLayout gridLayout = findViewById(R.id.gridLayout);
 
         gridLayout.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
             public void onSwipeTop() {
+                saveCellList(cellList);
                 int row;
                 int column = 3;
                 boolean stop = false;
@@ -170,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onSwipeRight() {
+                saveCellList(cellList);
                 int column;
                 int row = 3;
                 boolean stop = false;
@@ -273,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onSwipeLeft() {
+                saveCellList(cellList);
                 int column;
                 int row = 3;
                 boolean stop = false;
@@ -376,6 +393,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onSwipeBottom() {
+                saveCellList(cellList);
                 int row;
                 int column = 3;
                 boolean stop = false;
@@ -498,6 +516,8 @@ public class MainActivity extends AppCompatActivity {
         c16 = findViewById(R.id.c16);
 
         cellList = new TextView[4][4];
+        savedNumberList = new String[4][4];
+
         cellList[0][0] = c1;
         cellList[0][1] = c2;
         cellList[0][2] = c3;
@@ -514,6 +534,20 @@ public class MainActivity extends AppCompatActivity {
         cellList[3][1] = c14;
         cellList[3][2] = c15;
         cellList[3][3] = c16;
+
+        for (int i = 0; i < cellList.length; i++) {
+            for (int j = 0; j < cellList[0].length; j++) {
+                savedNumberList[i][j] = cellList[i][j].getText().toString();
+            }
+        }
+    }
+    private void saveCellList(TextView[][] cellList) {
+        for (int i = 0; i < cellList.length; i++) {
+            for (int j = 0; j < cellList[0].length; j++) {
+                savedNumberList[i][j]  = cellList[i][j].getText().toString();
+            }
+        }
+        System.out.println("");
     }
 
     private void checkGame() {
@@ -558,7 +592,5 @@ public class MainActivity extends AppCompatActivity {
 
             dialog.show();
         }
-
-
     }
 }

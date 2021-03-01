@@ -59,9 +59,6 @@ public class OnSwipeTouchListener implements View.OnTouchListener {
         }
     }
 
-    public void onSwipeTopRight() {
-    }
-
     public void onSwipeRight() {
     }
 

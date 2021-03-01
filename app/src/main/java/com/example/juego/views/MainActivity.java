@@ -1,14 +1,17 @@
 package com.example.juego.views;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.juego.db.WordListOpenHelper;
+import com.example.juego.db.ScoreHelper;
 import com.example.juego.listeners.OnSwipeTouchListener;
 import com.example.juego.R;
 import com.example.juego.utils.GameUtils;
@@ -31,6 +34,11 @@ public class MainActivity extends AppCompatActivity {
     TextView c14;
     TextView c15;
     TextView c16;
+    TextView scoreTextView;
+    TextView bestScoreTextView;
+    EditText userNameEditText;
+    int score = 0;
+    ScoreHelper mDB;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -38,11 +46,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         createCells();
+        scoreTextView = findViewById(R.id.scoreTextView);
+        bestScoreTextView = findViewById(R.id.bestScoreTextView);
 
-        WordListOpenHelper mDB = new WordListOpenHelper(this);
+        userNameEditText = findViewById(R.id.editTextUserName);
+        userNameEditText.setOnKeyListener((v, keyCode, event) -> {
+           if (keyCode == 66) {
+               userNameEditText.setEnabled(false);
+               return true;
+           }
+            return false;
+        });
+
+        mDB = new ScoreHelper(this);
 
         GameUtils.generateNumber(cellList);
 
+        bestScoreTextView.setText(mDB.getBestScore());
         GridLayout gridLayout = findViewById(R.id.gridLayout);
 
         gridLayout.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
@@ -94,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
                             int aboveY = row - 1;
                             if (originalCell.equals(aboveCell)) {
                                 cellList[aboveY][column].setText(String.valueOf(Integer.parseInt(originalCell) + (Integer.parseInt(aboveCell))));
+                                score = score + Integer.parseInt(originalCell) + (Integer.parseInt(aboveCell));
+                                scoreTextView.setText(String.valueOf(score));
                                 cellList[row][column].setText("");
                             }
                         }
@@ -142,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
+                checkGame();
                 GameUtils.generateNumber(cellList);
                 Log.d("UP", "UP");
             }
@@ -194,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
                             int rightX = column + 1;
                             if (originalCell.equals(rightCell)) {
                                 cellList[row][rightX].setText(String.valueOf(Integer.parseInt(originalCell) + Integer.parseInt(rightCell)));
+                                score = score + Integer.parseInt(originalCell) + (Integer.parseInt(rightCell));
+                                scoreTextView.setText(String.valueOf(score));
                                 cellList[row][column].setText("");
                             }
                         }
@@ -242,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
+                checkGame();
                 GameUtils.generateNumber(cellList);
                 Log.d("RIGHT", "RIGHT");
             }
@@ -294,6 +320,8 @@ public class MainActivity extends AppCompatActivity {
                         if (!originalCell.equals("")) {
                             if (originalCell.equals(leftCell)) {
                                 cellList[row][leftX].setText(String.valueOf(Integer.parseInt(originalCell) + Integer.parseInt(leftCell)));
+                                score = score + Integer.parseInt(originalCell) + (Integer.parseInt(leftCell));
+                                scoreTextView.setText(String.valueOf(score));
                                 cellList[row][column].setText("");
                             }
                         }
@@ -342,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
+                checkGame();
                 GameUtils.generateNumber(cellList);
                 Log.d("LEFT", "LEFT");
             }
@@ -394,6 +423,8 @@ public class MainActivity extends AppCompatActivity {
                         if (!originalCell.equals("")) {
                             if (originalCell.equals(belowCell)) {
                                 cellList[belowY][column].setText(String.valueOf(Integer.parseInt(originalCell) + Integer.parseInt(belowCell)));
+                                score = score + Integer.parseInt(originalCell) + (Integer.parseInt(belowCell));
+                                scoreTextView.setText(String.valueOf(score));
                                 cellList[row][column].setText("");
                             }
                         }
@@ -441,6 +472,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
+                checkGame();
                 GameUtils.generateNumber(cellList);
                 Log.d("DOWN", "DOWN");
             }
@@ -484,4 +516,49 @@ public class MainActivity extends AppCompatActivity {
         cellList[3][3] = c16;
     }
 
+    private void checkGame() {
+        int count = 0;
+        boolean win = false;
+
+        for (int i = 0; i < cellList.length; i++) {
+            for (int j = 0; j < cellList[0].length; j++) {
+                if (!cellList[i][j].getText().equals("")) {
+                    count++;
+                }
+
+                if(cellList[i][j].getText().equals("2048")) {
+                    win = true;
+                }
+            }
+        }
+
+        if (count + 1 == cellList.length * cellList[0].length || win) {
+            mDB.insert(String.valueOf(score));
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("2048");
+            if (win) {
+                builder.setMessage("YOU WIN");
+            } else {
+                builder.setMessage("YOU LOST");
+            }
+
+            builder.setPositiveButton("NEW GAME", (dialog, id) -> {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            });
+
+            builder.setNegativeButton("MENU",(dialog, id) -> {
+                Intent intent = new Intent(MainActivity.this, MenuActivity.class);
+                startActivity(intent);
+                finish();
+            });
+
+            AlertDialog dialog = builder.create();
+
+            dialog.show();
+        }
+
+
+    }
 }

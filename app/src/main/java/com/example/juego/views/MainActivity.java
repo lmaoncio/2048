@@ -555,7 +555,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkGame() {
         int count = 0;
         boolean win = false;
-
+        boolean canContinue = false;
         for (int i = 0; i < cellList.length; i++) {
             for (int j = 0; j < cellList[0].length; j++) {
                 if (!cellList[i][j].getText().equals("")) {
@@ -568,29 +568,49 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (count + 1 == cellList.length * cellList[0].length || win) {
-            mDB.insert(String.valueOf(score));
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("2048");
-            if (win) {
-                builder.setMessage("YOU WIN");
-            } else {
-                builder.setMessage("YOU LOST");
+        int n1 = cellList.length;
+        int n2 = cellList[0].length;
+        System.out.println();
+        if (count == cellList.length * cellList[0].length) {
+            for (int i = 1; i < cellList.length - 1; i++) {
+                for (int j = 1; j < cellList[0].length - 1; j++) {
+                    String original = cellList[i][j].getText().toString();
+                    String aboveOriginal = cellList[i - 1][j].getText().toString();
+                    String rightOriginal = cellList[i][j + 1].getText().toString();
+                    String leftOriginal = cellList[i][j - 1].getText().toString();
+                    String belowOriginal = cellList[i + 1][j].getText().toString();
+
+                    if (original.equals(aboveOriginal) || original.equals(rightOriginal) || original.equals(leftOriginal) || original.equals(belowOriginal)) {
+                        canContinue = true;
+                        break;
+                    }
+                }
             }
 
-            builder.setPositiveButton("NEW GAME", (dialog, id) -> {
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                startActivity(intent);
-            });
+            if (!canContinue || win) {
+                mDB.insert(String.valueOf(score));
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("2048");
+                if (win) {
+                    builder.setMessage("YOU WIN");
+                } else {
+                    builder.setMessage("YOU LOST");
+                }
 
-            builder.setNegativeButton("MENU", (dialog, id) -> {
-                Intent intent = new Intent(MainActivity.this, MenuActivity.class);
-                startActivity(intent);
-            });
+                builder.setPositiveButton("NEW GAME", (dialog, id) -> {
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(intent);
+                });
 
-            AlertDialog dialog = builder.create();
+                builder.setNegativeButton("MENU", (dialog, id) -> {
+                    Intent intent = new Intent(MainActivity.this, MenuActivity.class);
+                    startActivity(intent);
+                });
 
-            dialog.show();
+                AlertDialog dialog = builder.create();
+
+                dialog.show();
+            }
         }
     }
 }

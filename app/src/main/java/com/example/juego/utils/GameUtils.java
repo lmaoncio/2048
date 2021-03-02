@@ -12,6 +12,8 @@ import androidx.annotation.DrawableRes;
 
 import com.example.juego.R;
 
+import java.nio.charset.MalformedInputException;
+
 
 public class GameUtils {
     public static void setCellListColors(TextView[][] cellList) {
@@ -45,6 +47,18 @@ public class GameUtils {
     }
 
     public static void generateNumber(TextView[][] cellList) {
+        boolean generate = false;
+        for (int i = 0; i < cellList.length; i++) {
+            if (generate) {
+                break;
+            }
+            for (int j = 0; j < cellList[0].length; j++) {
+                if (cellList[i][j].getText().equals("")) {
+                    generate = true;
+                    break;
+                }
+            }
+        }
 
         int randomNumberY;
         int randomNumberX;
@@ -52,12 +66,13 @@ public class GameUtils {
         do {
             randomNumberY = (int) Math.floor(Math.random() * 4);
             randomNumberX = (int) Math.floor(Math.random() * 4);
-        } while (!cellList[randomNumberY][randomNumberX].getText().equals(""));
+        } while (!cellList[randomNumberY][randomNumberX].getText().equals("") && generate);
 
-        cellList[randomNumberY][randomNumberX].setText("2");
-        startAnimation(cellList[randomNumberY][randomNumberX]);
-        setCellListColors(cellList);
-
+        if (generate) {
+            cellList[randomNumberY][randomNumberX].setText("2");
+            startAnimation(cellList[randomNumberY][randomNumberX]);
+            setCellListColors(cellList);
+        }
     }
 
     public static void startAnimation(TextView textView) {

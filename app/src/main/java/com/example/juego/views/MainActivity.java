@@ -20,6 +20,7 @@ import com.example.juego.utils.GameUtils;
 public class MainActivity extends AppCompatActivity {
     TextView[][] cellList;
     String[][] savedNumberList;
+    int undoScore = 0;
     TextView c1;
     TextView c2;
     TextView c3;
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
                     cellList[i][j].setText(savedNumberList[i][j]);
                 }
             }
+            score = undoScore;
+            scoreTextView.setText(String.valueOf(undoScore));
         });
         GridLayout gridLayout = findViewById(R.id.gridLayout);
 
@@ -544,6 +547,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveCellList(TextView[][] cellList) {
+        undoScore = score;
         for (int i = 0; i < cellList.length; i++) {
             for (int j = 0; j < cellList[0].length; j++) {
                 savedNumberList[i][j] = cellList[i][j].getText().toString();

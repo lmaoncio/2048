@@ -69,7 +69,13 @@ public class GameUtils {
         } while (!cellList[randomNumberY][randomNumberX].getText().equals("") && generate);
 
         if (generate) {
-            cellList[randomNumberY][randomNumberX].setText("2");
+            int generatedNumber;
+            generatedNumber = (int) (Math.random() * 10) + 1;
+            if (generatedNumber > 8) {
+                cellList[randomNumberY][randomNumberX].setText("4");
+            } else {
+                cellList[randomNumberY][randomNumberX].setText("2");
+            }
             startAnimation(cellList[randomNumberY][randomNumberX]);
             setCellListColors(cellList);
         }

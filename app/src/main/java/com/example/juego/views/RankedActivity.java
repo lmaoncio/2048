@@ -9,19 +9,22 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.juego.R;
+import com.example.juego.db.ScoreItem;
 import com.example.juego.db.ScoreListAdapter;
 import com.example.juego.db.ScoreHelper;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class RankedActivity extends AppCompatActivity {
 
     private static final String TAG = RankedActivity.class.getSimpleName();
     private ScoreHelper mDB;
-
     public static final int SCORE_EDIT = 1;
     public static final int SCORE_ADD = -1;
     ImageButton backImageButton;
@@ -40,7 +43,7 @@ public class RankedActivity extends AppCompatActivity {
         });
         mDB = new ScoreHelper(this);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        mRecyclerView = findViewById(R.id.recyclerview);
         mAdapter = new ScoreListAdapter(this, mDB);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -55,9 +58,14 @@ public class RankedActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_search:
-                Intent intent = new Intent(getBaseContext(), SearchActivity.class);
-                startActivity(intent);
+            case R.id.action_name:
+                mAdapter.setScoreItemList(mDB.orderByName());
+                mAdapter.notifyDataSetChanged();
+                break;
+            case R.id.action_score:
+                mAdapter.setScoreItemList(mDB.orderByScore());
+                mAdapter.notifyDataSetChanged();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -67,13 +75,14 @@ public class RankedActivity extends AppCompatActivity {
 
         if (requestCode == SCORE_EDIT) {
             if (resultCode == RESULT_OK) {
-                String score = data.getStringExtra(EditScoreActivity.EXTRA_REPLY);
-                if (!TextUtils.isEmpty(score)) {
+                String name = data.getStringExtra(EditScoreActivity.EXTRA_REPLY);
+                String score = data.getStringExtra(EditScoreActivity.EXTRA_REPLY_TWO);
+                if (!TextUtils.isEmpty(score) && !TextUtils.isEmpty(name)) {
                     int id = data.getIntExtra(ScoreListAdapter.EXTRA_ID, -99);
                     if (id == SCORE_ADD) {
-                        mDB.insert(score);
+                        mDB.insert(name, score);
                     } else if (id >= 0) {
-                        mDB.update(id, score);
+                        mDB.update(id, name, Integer.parseInt(score));
                     }
                     mAdapter.notifyDataSetChanged();
                 } else {

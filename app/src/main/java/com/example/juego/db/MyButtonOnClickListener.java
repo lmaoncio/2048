@@ -18,16 +18,15 @@ package com.example.juego.db;
 
 import android.view.View;
 
-/**
- * Instantiated for the Edit and Delete buttons in WordListAdapter.
- */
 public class MyButtonOnClickListener implements View.OnClickListener {
     private static final String TAG = View.OnClickListener.class.getSimpleName();
     int id;
-    String score;
+    String name;
+    Integer score;
 
-    public MyButtonOnClickListener(int id, String score) {
+    public MyButtonOnClickListener(int id, String name, Integer score) {
         this.id = id;
+        this.name = name;
         this.score = score;
     }
 

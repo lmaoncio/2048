@@ -3,7 +3,12 @@ package com.example.juego.views;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.Switch;
@@ -16,6 +21,8 @@ import com.example.juego.db.ScoreHelper;
 import com.example.juego.listeners.OnSwipeTouchListener;
 import com.example.juego.R;
 import com.example.juego.utils.GameUtils;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
     TextView[][] cellList;
@@ -42,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     ImageButton undoImageButton;
     ImageButton newGameImageButton;
     ImageButton homeImageButton;
+    EditText personNameEditText;
     int score = 0;
     ScoreHelper mDB;
 
@@ -56,11 +64,38 @@ public class MainActivity extends AppCompatActivity {
         newGameImageButton = findViewById(R.id.newGameButton);
         undoImageButton = findViewById(R.id.undoButton);
         homeImageButton = findViewById(R.id.homeButton);
+        personNameEditText = findViewById(R.id.editTextTextPersonName);
 
         mDB = new ScoreHelper(this);
-        bestScoreTextView.setText(mDB.getBestScore());
+        bestScoreTextView.setText(String.valueOf(mDB.getBestScore()));
 
         GameUtils.generateNumber(cellList);
+
+        cellList[0][0].setText("1");
+        cellList[0][1].setText("2");
+        cellList[0][2].setText("3");
+        cellList[0][3].setText("4");
+        cellList[1][0].setText("5");
+        cellList[1][1].setText("6");
+        cellList[1][2].setText("7");
+        cellList[1][3].setText("8");
+        cellList[2][0].setText("1");
+        cellList[2][1].setText("1");
+        cellList[2][2].setText("1");
+        cellList[2][3].setText("1");
+        cellList[3][0].setText("1");
+        cellList[3][1].setText("1");
+        cellList[3][2].setText("1");
+        cellList[3][3].setText("1");
+
+        personNameEditText.setOnKeyListener((v, keyCode, event) -> {
+            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                personNameEditText.setEnabled(false);
+                return true;
+            }
+            return false;
+        });
 
         homeImageButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, MenuActivity.class);
@@ -85,7 +120,9 @@ public class MainActivity extends AppCompatActivity {
 
         gridLayout.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
             public void onSwipeTop() {
+                checkGame();
                 saveCellList(cellList);
+
                 int row;
                 int column = 3;
                 boolean stop = false;
@@ -183,13 +220,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-                checkGame();
                 GameUtils.generateNumber(cellList);
                 Log.d("UP", "UP");
             }
 
             public void onSwipeRight() {
+                checkGame();
                 saveCellList(cellList);
+
                 int column;
                 int row = 3;
                 boolean stop = false;
@@ -287,13 +325,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-                checkGame();
                 GameUtils.generateNumber(cellList);
                 Log.d("RIGHT", "RIGHT");
             }
 
             public void onSwipeLeft() {
+                checkGame();
                 saveCellList(cellList);
+
                 int column;
                 int row = 3;
                 boolean stop = false;
@@ -397,7 +436,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onSwipeBottom() {
+                checkGame();
                 saveCellList(cellList);
+
                 int row;
                 int column = 3;
                 boolean stop = false;
@@ -494,7 +535,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-                checkGame();
+
                 GameUtils.generateNumber(cellList);
                 Log.d("DOWN", "DOWN");
             }
@@ -572,9 +613,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        int n1 = cellList.length;
-        int n2 = cellList[0].length;
-        System.out.println();
         if (count == cellList.length * cellList[0].length) {
             for (int i = 1; i < cellList.length - 1; i++) {
                 for (int j = 1; j < cellList[0].length - 1; j++) {
@@ -592,7 +630,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (!canContinue || win) {
-                mDB.insert(String.valueOf(score));
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("2048");
                 if (win) {
@@ -604,11 +642,17 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("NEW GAME", (dialog, id) -> {
                     Intent intent = new Intent(MainActivity.this, MainActivity.class);
                     startActivity(intent);
+                    mDB.insert(personNameEditText.getText().toString(), String.valueOf(score));
                 });
 
-                builder.setNegativeButton("MENU", (dialog, id) -> {
+                builder.setNeutralButton("MENU", (dialog, id) -> {
                     Intent intent = new Intent(MainActivity.this, MenuActivity.class);
                     startActivity(intent);
+                    mDB.insert(personNameEditText.getText().toString(), String.valueOf(score));
+                });
+
+                builder.setNegativeButton("UNDO MOVE", (dialog, id) -> {
+
                 });
 
                 AlertDialog dialog = builder.create();

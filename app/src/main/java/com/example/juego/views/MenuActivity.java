@@ -27,8 +27,6 @@ public class MenuActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
         listview.setAdapter(adapter);
 
-        listview.setAdapter(adapter);
-
         listview.setOnItemClickListener((adapterView, view, position, id) -> {
             if (position == 0) {
                 Intent intent = new Intent(MenuActivity.this, MainActivity.class);

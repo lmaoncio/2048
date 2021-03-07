@@ -8,18 +8,22 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 public class ScoreHelper extends SQLiteOpenHelper {
     private static final String TAG = ScoreHelper.class.getSimpleName();
     private static final int DATABASE_VERSION = 1;
     private static final String SCORE_LIST_TABLE = "score_entries";
     private static final String DATABASE_NAME = "scoreList";
     public static final String KEY_ID = "_id";
-    public static final String KEY_SCORE = "name";
-    private static final String[] COLUMNS = {KEY_ID, KEY_SCORE};
+    public static final String KEY_NAME = "name";
+    public static final String KEY_SCORE = "score";
+    private static final String[] COLUMNS = {KEY_ID, KEY_NAME, KEY_SCORE};
     private static final String WORD_LIST_TABLE_CREATE =
             "CREATE TABLE " + SCORE_LIST_TABLE + " (" +
                     KEY_ID + " INTEGER PRIMARY KEY, " +
-                    KEY_SCORE + " TEXT " + " );";
+                    KEY_NAME + " TEXT, " +
+                    KEY_SCORE + " INTEGER " + " );";
     private SQLiteDatabase mWritableDB;
     private SQLiteDatabase mReadableDB;
 
@@ -27,20 +31,73 @@ public class ScoreHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    private void fillDatabaseWithData(SQLiteDatabase db) {
-        String[] words = {"Android", "Adapter", "ListView", "AsyncTask",
-                "Android Studio", "SQLiteDatabase", "SQLOpenHelper",
-                "Data model", "ViewHolder", "Android Performance",
-                "OnClickListener"};
+    public ArrayList<ScoreItem> queryAll() {
+        ArrayList<ScoreItem> scoreItemsList = new ArrayList<>();
+        String query = "SELECT * FROM " + SCORE_LIST_TABLE;
 
-        ContentValues values = new ContentValues();
-
-        for (int i = 0; i < words.length; i++) {
-            values.put(KEY_SCORE, words[i]);
-            db.insert(SCORE_LIST_TABLE, null, values);
+        Cursor cursor = null;
+        if (mReadableDB == null) {
+            mReadableDB = getReadableDatabase();
         }
+        cursor = mReadableDB.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                ScoreItem score = new ScoreItem();
+                score.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+                score.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                score.setScore(cursor.getInt(cursor.getColumnIndex(KEY_SCORE)));
+
+                scoreItemsList.add(score);
+                cursor.moveToNext();
+            }
+        }
+
+        return scoreItemsList;
     }
 
+    public ArrayList<ScoreItem> orderByScore() {
+        ArrayList<ScoreItem> scores = new ArrayList<>();
+        String query = "SELECT * FROM " + SCORE_LIST_TABLE + " order by " + KEY_SCORE + " ASC";
+        Cursor cursor = null;
+        if (mReadableDB == null) {
+            mReadableDB = getReadableDatabase();
+        }
+        cursor = mReadableDB.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                ScoreItem score = new ScoreItem();
+                score.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+                score.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                score.setScore(cursor.getInt(cursor.getColumnIndex(KEY_SCORE)));
+                scores.add(score);
+                cursor.moveToNext();
+            }
+        }
+        return scores;
+    }
+    public ArrayList<ScoreItem> orderByName() {
+        ArrayList<ScoreItem> scores = new ArrayList<>();
+        String query = "SELECT * FROM " + SCORE_LIST_TABLE + " order by " + KEY_NAME + " ASC";
+        Cursor cursor = null;
+        if (mReadableDB == null) {
+            mReadableDB = getReadableDatabase();
+        }
+        cursor = mReadableDB.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                ScoreItem score = new ScoreItem();
+                score.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+                score.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                score.setScore(cursor.getInt(cursor.getColumnIndex(KEY_SCORE)));
+                scores.add(score);
+                cursor.moveToNext();
+            }
+        }
+        return scores;
+    }
     public ScoreItem query(int position) {
         String query = "SELECT * FROM " + SCORE_LIST_TABLE +
                 " ORDER BY " + KEY_SCORE + " ASC " +
@@ -56,7 +113,8 @@ public class ScoreHelper extends SQLiteOpenHelper {
             cursor = mReadableDB.rawQuery(query, null);
             cursor.moveToFirst();
             entry.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
-            entry.setScore(cursor.getString(cursor.getColumnIndex(KEY_SCORE)));
+            entry.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+            entry.setScore(cursor.getInt(cursor.getColumnIndex(KEY_SCORE)));
         } catch (Exception e) {
             Log.d(TAG, "EXCEPTION! " + e);
         } finally {
@@ -65,7 +123,7 @@ public class ScoreHelper extends SQLiteOpenHelper {
         }
     }
 
-    public String getBestScore() {
+    public Integer getBestScore() {
         String query = "SELECT * FROM " + SCORE_LIST_TABLE +
                 " ORDER BY " + KEY_SCORE + " DESC " +
                 "LIMIT " + "1";
@@ -80,7 +138,8 @@ public class ScoreHelper extends SQLiteOpenHelper {
             cursor = mReadableDB.rawQuery(query, null);
             cursor.moveToFirst();
             entry.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
-            entry.setScore(cursor.getString(cursor.getColumnIndex(KEY_SCORE)));
+            entry.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+            entry.setScore(cursor.getInt(cursor.getColumnIndex(KEY_SCORE)));
         } catch (Exception e) {
             Log.d(TAG, "EXCEPTION! " + e);
         } finally {
@@ -92,7 +151,6 @@ public class ScoreHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(WORD_LIST_TABLE_CREATE);
-        fillDatabaseWithData(db);
     }
 
     @Override
@@ -104,10 +162,12 @@ public class ScoreHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public long insert(String word) {
+    public long insert(String name, String score) {
         long newId = 0;
         ContentValues values = new ContentValues();
-        values.put(KEY_SCORE, word);
+        values.put(KEY_NAME, name);
+        values.put(KEY_SCORE, score);
+
         try {
             if (mWritableDB == null) {
                 mWritableDB = getWritableDatabase();
@@ -120,14 +180,15 @@ public class ScoreHelper extends SQLiteOpenHelper {
         return newId;
     }
 
-    public int update(int id, String word) {
+    public int update(int id, String name, Integer score) {
         int mNumberOfRowsUpdated = -1;
         try {
             if (mWritableDB == null) {
                 mWritableDB = getWritableDatabase();
             }
             ContentValues values = new ContentValues();
-            values.put(KEY_SCORE, word);
+            values.put(KEY_NAME, name);
+            values.put(KEY_SCORE, score);
             mNumberOfRowsUpdated = mWritableDB.update(SCORE_LIST_TABLE,
                     values,
                     KEY_ID + " = ?",

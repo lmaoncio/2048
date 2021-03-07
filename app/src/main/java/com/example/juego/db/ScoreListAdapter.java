@@ -19,6 +19,7 @@ package com.example.juego.db;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,25 +32,33 @@ import com.example.juego.R;
 import com.example.juego.views.EditScoreActivity;
 import com.example.juego.views.RankedActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.ScoreHolder> {
     private static final String EXTRA_POSITION = "POSITION";
+    List<ScoreItem> scoreItemList;
 
     class ScoreHolder extends RecyclerView.ViewHolder {
+        public final TextView nameItemView;
         public final TextView scoreItemView;
         Button delete_button;
         Button edit_button;
 
+
         public ScoreHolder(View scoreItem) {
             super(scoreItem);
-            scoreItemView = (TextView) scoreItem.findViewById(R.id.score);
-            delete_button = (Button)scoreItem.findViewById(R.id.delete_button);
-            edit_button = (Button)scoreItem.findViewById(R.id.edit_button);
+            nameItemView = scoreItem.findViewById(R.id.name);
+            scoreItemView = scoreItem.findViewById(R.id.score);
+            delete_button = scoreItem.findViewById(R.id.delete_button);
+            edit_button = scoreItem.findViewById(R.id.edit_button);
         }
     }
 
     private static final String TAG = ScoreListAdapter.class.getSimpleName();
     ScoreHelper mDB;
     public static final String EXTRA_ID = "ID";
+    public static final String EXTRA_NAME = "NAME";
     public static final String EXTRA_SCORE = "SCORE";
 
     private final LayoutInflater mInflater;
@@ -59,6 +68,7 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.Scor
         mInflater = LayoutInflater.from(context);
         mContext = context;
         mDB = db;
+        scoreItemList = mDB.queryAll();
     }
 
 
@@ -70,36 +80,47 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.Scor
 
     @Override
     public void onBindViewHolder(final ScoreHolder holder, final int position) {
-        final ScoreItem current = mDB.query(position);
-        holder.scoreItemView.setText(current.getScore());
+        final ScoreItem current = scoreItemList.get(position);
+        holder.nameItemView.setText(current.getName());
+        holder.scoreItemView.setText(String.valueOf(current.getScore()));
         holder.edit_button.setOnClickListener(new MyButtonOnClickListener(
-                current.getId(), current.getScore()) {
+                current.getId(), current.getName(), current.getScore()) {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, EditScoreActivity.class);
                 intent.putExtra(EXTRA_ID, id);
                 intent.putExtra(EXTRA_POSITION, holder.getAdapterPosition());
+                intent.putExtra(EXTRA_NAME, name);
                 intent.putExtra(EXTRA_SCORE, score);
 
-                ((Activity) mContext).startActivityForResult(
-                        intent, RankedActivity.SCORE_EDIT);
+                ((Activity) mContext).startActivityForResult(intent, RankedActivity.SCORE_EDIT);
+                scoreItemList = mDB.queryAll();
+                notifyDataSetChanged();
             }
         });
 
         holder.delete_button.setOnClickListener(new MyButtonOnClickListener(
-                current.getId(), current.getScore()) {
+                current.getId(), current.getName(), current.getScore()) {
             @Override
             public void onClick(View v) {
-                int id = mDB.query(holder.getAdapterPosition()).getId();
-                mDB.delete(id);
+                mDB.delete(current.getId());
+                scoreItemList = mDB.queryAll();
                 notifyDataSetChanged();
             }
         });
     }
 
+    public List<ScoreItem> getScoreItemList() {
+        return scoreItemList;
+    }
+
+    public void setScoreItemList(List<ScoreItem> scoreItemList) {
+        this.scoreItemList = scoreItemList;
+    }
+
     @Override
     public int getItemCount() {
-        return (int) mDB.count();
+        return (int) scoreItemList.size();
     }
 }
 

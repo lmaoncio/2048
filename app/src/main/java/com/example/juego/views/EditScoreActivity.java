@@ -35,11 +35,13 @@ public class EditScoreActivity extends AppCompatActivity {
     private static final String TAG = EditScoreActivity.class.getSimpleName();
 
     private static final int NO_ID = -99;
-    private static final String NO_SCORE = "";
-
+    private static final String NO_NAME = "";
+    private static final Integer NO_SCORE = 0;
+    private EditText mEditNameView;
     private EditText mEditScoreView;
 
-    public static final String EXTRA_REPLY = "com.example.android.wordlistsql.REPLY";
+    public static final String EXTRA_REPLY = "Reply";
+    public static final String EXTRA_REPLY_TWO = "Reply_Two";
 
     int mId = RankedActivity.SCORE_ADD;
 
@@ -48,28 +50,36 @@ public class EditScoreActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_score);
 
-        mEditScoreView = (EditText) findViewById(R.id.edit_score);
+        mEditNameView = findViewById(R.id.edit_name);
+        mEditScoreView = findViewById(R.id.edit_score);
 
         Bundle extras = getIntent().getExtras();
 
         if (extras != null) {
             int id = extras.getInt(ScoreListAdapter.EXTRA_ID, NO_ID);
-            String word = extras.getString(ScoreListAdapter.EXTRA_SCORE, NO_SCORE);
-            if (id != NO_ID && !word.equals(NO_SCORE)) {
+            Integer score = extras.getInt(ScoreListAdapter.EXTRA_SCORE, NO_SCORE);
+            String name = extras.getString(ScoreListAdapter.EXTRA_NAME, NO_NAME);
+            if (id != NO_ID && score != 0 && !name.equals(NO_NAME)) {
                 mId = id;
-                mEditScoreView.setText(word);
+                mEditNameView.setText(name);
+                mEditScoreView.setText(String.valueOf(score));
             }
         }
     }
 
     public void returnReply(View view) {
+
+        String name = ((EditText) findViewById(R.id.edit_name)).getText().toString();
         String score = ((EditText) findViewById(R.id.edit_score)).getText().toString();
 
         Intent replyIntent = new Intent();
-        replyIntent.putExtra(EXTRA_REPLY, score);
+        replyIntent.putExtra(EXTRA_REPLY, name);
+        replyIntent.putExtra(EXTRA_REPLY_TWO, score);
         replyIntent.putExtra(ScoreListAdapter.EXTRA_ID, mId);
         setResult(RESULT_OK, replyIntent);
         finish();
+
+
     }
 }
 

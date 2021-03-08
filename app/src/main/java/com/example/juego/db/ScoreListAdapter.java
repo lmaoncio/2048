@@ -94,7 +94,6 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.Scor
                 intent.putExtra(EXTRA_SCORE, score);
 
                 ((Activity) mContext).startActivityForResult(intent, RankedActivity.SCORE_EDIT);
-                scoreItemList = mDB.queryAll();
                 notifyDataSetChanged();
             }
         });

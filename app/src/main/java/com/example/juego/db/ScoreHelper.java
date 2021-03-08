@@ -58,7 +58,7 @@ public class ScoreHelper extends SQLiteOpenHelper {
 
     public ArrayList<ScoreItem> orderByScore() {
         ArrayList<ScoreItem> scores = new ArrayList<>();
-        String query = "SELECT * FROM " + SCORE_LIST_TABLE + " order by " + KEY_SCORE + " ASC";
+        String query = "SELECT * FROM " + SCORE_LIST_TABLE + " order by " + KEY_SCORE + " DESC";
         Cursor cursor = null;
         if (mReadableDB == null) {
             mReadableDB = getReadableDatabase();
@@ -97,30 +97,6 @@ public class ScoreHelper extends SQLiteOpenHelper {
             }
         }
         return scores;
-    }
-    public ScoreItem query(int position) {
-        String query = "SELECT * FROM " + SCORE_LIST_TABLE +
-                " ORDER BY " + KEY_SCORE + " ASC " +
-                "LIMIT " + position + ",1";
-
-        Cursor cursor = null;
-
-        ScoreItem entry = new ScoreItem();
-        try {
-            if (mReadableDB == null) {
-                mReadableDB = getReadableDatabase();
-            }
-            cursor = mReadableDB.rawQuery(query, null);
-            cursor.moveToFirst();
-            entry.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
-            entry.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-            entry.setScore(cursor.getInt(cursor.getColumnIndex(KEY_SCORE)));
-        } catch (Exception e) {
-            Log.d(TAG, "EXCEPTION! " + e);
-        } finally {
-            cursor.close();
-            return entry;
-        }
     }
 
     public Integer getBestScore() {
@@ -220,11 +196,11 @@ public class ScoreHelper extends SQLiteOpenHelper {
         return DatabaseUtils.queryNumEntries(mReadableDB, SCORE_LIST_TABLE);
     }
 
-    public Cursor search(String word) {
-        String[] columns = new String[]{KEY_SCORE};
-        word = "%" + word + "%";
-        String where = KEY_SCORE + " LIKE ?";
-        String[] whereArgs = new String[]{word};
+    public Cursor search(String name) {
+        String[] columns = new String[]{KEY_NAME, KEY_SCORE};
+        name = "%" + name + "%";
+        String where = KEY_NAME + " LIKE ?";
+        String[] whereArgs = new String[]{name};
 
         Cursor cursor = null;
 

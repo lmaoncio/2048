@@ -12,6 +12,7 @@
         <activity android:name=".views.RankedActivity" />
         <activity android:name=".views.EditScoreActivity" />
         <activity android:name=".views.MenuActivity" />
+        <activity android:name=".views.SearchActivity" />
         <activity android:name=".views.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

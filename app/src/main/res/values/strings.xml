@@ -15,4 +15,5 @@
     <string name="button_search">search</string>
     <string name="order_by_score">ORDER BY: SCORE</string>
     <string name="order_by_name">ORDER BY: NAME</string>
+    <string name="search">SEARCH</string>
 </resources>

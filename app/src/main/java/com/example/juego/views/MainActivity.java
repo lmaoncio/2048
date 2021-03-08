@@ -24,9 +24,12 @@ import com.example.juego.utils.GameUtils;
 
 import org.w3c.dom.Text;
 
+import java.sql.SQLOutput;
+
 public class MainActivity extends AppCompatActivity {
     TextView[][] cellList;
     String[][] savedNumberList;
+    String[][] savedUndoList;
     int undoScore = 0;
     TextView c1;
     TextView c2;
@@ -71,23 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         GameUtils.generateNumber(cellList);
 
-        cellList[0][0].setText("1");
-        cellList[0][1].setText("2");
-        cellList[0][2].setText("3");
-        cellList[0][3].setText("4");
-        cellList[1][0].setText("5");
-        cellList[1][1].setText("6");
-        cellList[1][2].setText("7");
-        cellList[1][3].setText("8");
-        cellList[2][0].setText("1");
-        cellList[2][1].setText("1");
-        cellList[2][2].setText("1");
-        cellList[2][3].setText("1");
-        cellList[3][0].setText("1");
-        cellList[3][1].setText("1");
-        cellList[3][2].setText("1");
-        cellList[3][3].setText("1");
-
         personNameEditText.setOnKeyListener((v, keyCode, event) -> {
             if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                     (keyCode == KeyEvent.KEYCODE_ENTER)) {
@@ -115,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             }
             score = undoScore;
             scoreTextView.setText(String.valueOf(undoScore));
+            GameUtils.setCellListColors(cellList);
         });
         GridLayout gridLayout = findViewById(R.id.gridLayout);
 
@@ -221,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } while (!stop);
                 GameUtils.generateNumber(cellList);
+                checkGame();
                 Log.d("UP", "UP");
             }
 
@@ -326,6 +314,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } while (!stop);
                 GameUtils.generateNumber(cellList);
+                checkGame();
                 Log.d("RIGHT", "RIGHT");
             }
 
@@ -430,8 +419,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-                checkGame();
                 GameUtils.generateNumber(cellList);
+                checkGame();
                 Log.d("LEFT", "LEFT");
             }
 
@@ -535,8 +524,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } while (!stop);
-
                 GameUtils.generateNumber(cellList);
+                checkGame();
                 Log.d("DOWN", "DOWN");
             }
         });
@@ -614,17 +603,36 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (count == cellList.length * cellList[0].length) {
-            for (int i = 1; i < cellList.length - 1; i++) {
-                for (int j = 1; j < cellList[0].length - 1; j++) {
+            for (int i = 0; i < cellList.length; i++) {
+                for (int j = 0; j < cellList[0].length; j++) {
                     String original = cellList[i][j].getText().toString();
-                    String aboveOriginal = cellList[i - 1][j].getText().toString();
-                    String rightOriginal = cellList[i][j + 1].getText().toString();
-                    String leftOriginal = cellList[i][j - 1].getText().toString();
-                    String belowOriginal = cellList[i + 1][j].getText().toString();
+                    if (i == cellList.length - 1 || j == cellList[0].length - 1) {
+                        if (i == cellList.length - 1 && j == cellList[0].length - 1) {
+                            break;
+                        } else {
+                            if (i == cellList.length - 1) {
+                                String rightOriginal = cellList[i][j + 1].getText().toString();
+                                if (original.equals(rightOriginal)) {
+                                    canContinue = true;
+                                    break;
+                                }
+                            }
+                            if (j == cellList[0].length - 1) {
+                                String belowOriginal = cellList[i + 1][j].getText().toString();
+                                if (original.equals(belowOriginal)) {
+                                    canContinue = true;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        String rightOriginal = cellList[i][j + 1].getText().toString();
+                        String belowOriginal = cellList[i + 1][j].getText().toString();
 
-                    if (original.equals(aboveOriginal) || original.equals(rightOriginal) || original.equals(leftOriginal) || original.equals(belowOriginal)) {
-                        canContinue = true;
-                        break;
+                        if (original.equals(belowOriginal) || original.equals(rightOriginal)) {
+                            canContinue = true;
+                            break;
+                        }
                     }
                 }
             }

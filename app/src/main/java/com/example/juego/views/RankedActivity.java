@@ -58,6 +58,10 @@ public class RankedActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_search:
+                Intent intent = new Intent(getBaseContext(), SearchActivity.class);
+                startActivity(intent);
+                break;
             case R.id.action_name:
                 mAdapter.setScoreItemList(mDB.orderByName());
                 mAdapter.notifyDataSetChanged();
@@ -84,6 +88,7 @@ public class RankedActivity extends AppCompatActivity {
                     } else if (id >= 0) {
                         mDB.update(id, name, Integer.parseInt(score));
                     }
+                    mAdapter.setScoreItemList(mDB.queryAll());
                     mAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(
